@@ -1,8 +1,9 @@
 package com.sewq.stringcalculator;
 
+import com.sewq.stringcalculator.parser.DelimiterParser;
+
 import java.util.Arrays;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,10 +13,8 @@ public class StringCalculatorImpl implements StringCalculator {
     private static final String DEFAULT_DELIMITER = ",";
     private static final String DELIMITERS_FROM_NUMBERS_SEPARATOR = "//|\n";
     private static final String NEW_LINE = "|\n";
-    private static final String MULTIPLE_DELIMITERS_SEPARATOR = "]\\[";
-    private static final String JOINING_SEPARATOR = "|";
     private static final String CUSTOM_DELIMITERS_INDICATOR = "//";
-    private static final String MULTIPLE_DELIMITERS_INDICATOR = "[";
+    private static final int LIMIT = 1000;
 
     @Override
     public int add(String calculationInput) throws IllegalAccessException {
@@ -30,27 +29,16 @@ public class StringCalculatorImpl implements StringCalculator {
         return performCalculations(calculationInput, DEFAULT_DELIMITER);
     }
 
-    private boolean noInputProvided(final String stringRepresentedNumbers) {
+    private boolean noInputProvided(String stringRepresentedNumbers) {
         return stringRepresentedNumbers.isEmpty();
     }
 
-    private int calculateWithCustomSeparator(final String calculationInput) {
+    private int calculateWithCustomSeparator(String calculationInput) {
         String[] inputs = calculationInput.split(DELIMITERS_FROM_NUMBERS_SEPARATOR, SPLIT_LIMIT);
         String possibleDelimiters = inputs[1];
         String numbersSeparatedWithDelimiters = inputs[2];
-        String delimiter = parseDelimiter(possibleDelimiters);
+        String delimiter = DelimiterParser.parseDelimiter(possibleDelimiters);
         return performCalculations(numbersSeparatedWithDelimiters, delimiter);
-    }
-
-    private String parseDelimiter(final String possibleDelimiters) {
-        String targetDelimiter = possibleDelimiters;
-        if (possibleDelimiters.startsWith(MULTIPLE_DELIMITERS_INDICATOR)) {
-            String delimitersWithoutSurroundings = possibleDelimiters.substring(1, possibleDelimiters.length() - 1);
-            targetDelimiter = Stream.of(delimitersWithoutSurroundings.split(MULTIPLE_DELIMITERS_SEPARATOR)).map(Pattern::quote)
-                    .collect(Collectors.joining(
-                            JOINING_SEPARATOR));
-        }
-        return targetDelimiter;
     }
 
     private Integer performCalculations(final String numbers, final String separator) {
@@ -71,11 +59,10 @@ public class StringCalculatorImpl implements StringCalculator {
     }
 
     private Integer calculateSumOfNumbers(final String numbers, final String separator) {
-        return getParsedNumbers(numbers, separator).filter(numbersLessOrEqualThanThousand()).reduce(0, Integer::sum);
+        return getParsedNumbers(numbers, separator).filter(numbersLessOrEqualThan(LIMIT)).reduce(0, Integer::sum);
     }
 
-    private Predicate<Integer> numbersLessOrEqualThanThousand() {
-        return x -> x <= 1000;
+    private Predicate<Integer> numbersLessOrEqualThan(final Integer limit) {
+        return number -> number <= limit;
     }
-
 }
