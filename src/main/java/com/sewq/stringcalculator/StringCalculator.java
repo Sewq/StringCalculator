@@ -1,5 +1,5 @@
 package com.sewq.stringcalculator;
 
 public interface StringCalculator {
-    int add(String s) throws IllegalAccessException;
+    int add(String calculationInput) throws IllegalAccessException;
 }
