@@ -60,8 +60,7 @@ public class StringCalculatorTest {
     }
 
     @Test
-    public void ShouldReturnThree_whenOneAndTwoPassedWithMixedSeparators() {
-        Assertions.assertThat(stringCalculator.add("1\n2")).isEqualTo(3);
-
+    public void ShouldReturn6_whenOneAndTwoPassedWithMixedSeparators() {
+        Assertions.assertThat(stringCalculator.add("1\n2,3")).isEqualTo(6);
     }
 }
