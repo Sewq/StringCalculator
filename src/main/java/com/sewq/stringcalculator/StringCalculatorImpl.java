@@ -1,6 +1,6 @@
 package com.sewq.stringcalculator;
 
-import com.sewq.stringcalculator.parser.DelimiterParser;
+import com.sewq.stringcalculator.parser.StringParser;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -16,8 +16,14 @@ public class StringCalculatorImpl implements StringCalculator {
     private static final String CUSTOM_DELIMITERS_INDICATOR = "//";
     private static final int LIMIT = 1000;
 
+    private StringParser delimiterParser;
+
+    public StringCalculatorImpl(StringParser delimiterParser) {
+        this.delimiterParser = delimiterParser;
+    }
+
     @Override
-    public int add(String calculationInput) throws IllegalAccessException {
+    public int add(String calculationInput) throws IllegalArgumentException {
 
         if (noInputProvided(calculationInput)) {
             return 0;
@@ -37,7 +43,7 @@ public class StringCalculatorImpl implements StringCalculator {
         String[] inputs = calculationInput.split(DELIMITERS_FROM_NUMBERS_SEPARATOR, SPLIT_LIMIT);
         String possibleDelimiters = inputs[1];
         String numbersSeparatedWithDelimiters = inputs[2];
-        String delimiter = DelimiterParser.parseDelimiter(possibleDelimiters);
+        String delimiter = delimiterParser.parse(possibleDelimiters);
         return performCalculations(numbersSeparatedWithDelimiters, delimiter);
     }
 
@@ -45,13 +51,12 @@ public class StringCalculatorImpl implements StringCalculator {
         String negativeNumbers = getNegativeNumbers(numbers, separator);
         if (!negativeNumbers.isEmpty()) {
             throw new IllegalArgumentException("negatives not allowed: " + negativeNumbers);
-        } else {
-            return calculateSumOfNumbers(numbers, separator);
         }
+        return calculateSumOfNumbers(numbers, separator);
     }
 
     private String getNegativeNumbers(final String numbers, final String separator) {
-        return getParsedNumbers(numbers, separator).filter(x -> x < 0).map(String::valueOf).collect(Collectors.joining(", "));
+        return getParsedNumbers(numbers, separator).filter(number -> number < 0).map(String::valueOf).collect(Collectors.joining(", "));
     }
 
     private Stream<Integer> getParsedNumbers(final String numbers, final String separator) {

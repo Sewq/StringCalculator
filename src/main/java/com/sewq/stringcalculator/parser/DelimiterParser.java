@@ -4,13 +4,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DelimiterParser {
+public class DelimiterParser implements StringParser {
 
     private static final String MULTIPLE_DELIMITERS_SEPARATOR = "]\\[";
     private static final String JOINING_SEPARATOR = "|";
     private static final String MULTIPLE_DELIMITERS_INDICATOR = "[";
 
-    public static String parseDelimiter(String possibleDelimiters) {
+    @Override
+    public String parse(String possibleDelimiters) {
         String targetDelimiter = possibleDelimiters;
         if (possibleDelimiters.startsWith(MULTIPLE_DELIMITERS_INDICATOR)) {
             String delimitersWithoutSurroundings = extractDelimitersWithoutSquareBrackets(possibleDelimiters);
@@ -21,7 +22,7 @@ public class DelimiterParser {
         return targetDelimiter;
     }
 
-    private static String extractDelimitersWithoutSquareBrackets(String possibleDelimiters) {
+    private String extractDelimitersWithoutSquareBrackets(String possibleDelimiters) {
         return possibleDelimiters.substring(1, possibleDelimiters.length() - 1);
     }
 }
